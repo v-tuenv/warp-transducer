@@ -142,7 +142,7 @@ __global__ void compute_betas_kernel_naive(const Tp* const acts, const Tp* const
 
 template<int NT, typename Tp>
 __global__ void compute_grad_kernel(Tp* grads, const Tp* const acts, const Tp* const denom, const Tp* alphas, const Tp* betas, const Tp* const logll, const int* const xlen, const int* const ylen, 
-    const int* const mlabels, const int minibatch, const int maxT, const int maxU, const int alphabet_size, const int blank_) {
+                                    const int* const mlabels, const int minibatch, const int maxT, const int maxU, const int alphabet_size, const int blank_, const float fastemit_lambda_) {
     int tid = threadIdx.x; // alphabet dim
     int idx = tid;
     int col = blockIdx.x; // mb, t, u
@@ -163,13 +163,13 @@ __global__ void compute_grad_kernel(Tp* grads, const Tp* const acts, const Tp* c
             Tp grad = exp(alphas[col] + betas[col] + logpk - logll[mb]);
             // grad to last blank transition
             if (idx == blank_ && t == T-1 && u == U-1) {
-                grad -= exp(alphas[col] + logpk - logll[mb]);
+              grad -= exp(alphas[col] + logpk - logll[mb]);
             }
             if (idx == blank_ && t < T-1) {
-                grad -= exp(alphas[col] + logpk - logll[mb] + betas[col + maxU]);
+              grad -= exp(alphas[col] + logpk - logll[mb] + betas[col + maxU]);
             }
             if (u < U-1 && idx == labels[u]) {
-                grad -= exp(alphas[col] + logpk - logll[mb] + betas[col+1]);
+              grad -= (1. + fastemit_lambda_) * exp(alphas[col] + logpk - logll[mb] + betas[col+1]);
             }
             grads[col * alphabet_size + idx] = grad;
 
