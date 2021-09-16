@@ -263,7 +263,7 @@ CpuRNNT<ProbT>::compute_betas_and_grad(ProbT* grad, const ProbT* const log_probs
                 grad[idx(t, u, labels[u])] = -(
                                                (1. + fastemit_lambda_)
                                                * std::exp(log_probs[idx(t, u) * 2 + 1] + g - loglike)
-                                               )
+                                               );
             }
         }
     }
