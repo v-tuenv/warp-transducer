@@ -196,9 +196,16 @@ GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
         start = std::chrono::high_resolution_clock::now();
 #endif
         // TODO optimize gradient kernel
-        compute_grad_kernel<128, ProbT><<<minibatch_ * maxT_ * maxU_, 128, 0, stream_>>>(grads, 
-            acts, denom, alphas, betas, llForward, input_lengths, label_lengths, labels, 
-            minibatch_, maxT_, maxU_, alphabet_size_, blank_, fastemit_lambda_);
+
+        if (fastemit_lambda_ > 0.0f) {
+            compute_fastemit_grad_kernel<128, ProbT><<<minibatch_ * maxT_ * maxU_, 128, 0, stream_>>>(grads, 
+                acts, denom, alphas, betas, llForward, input_lengths, label_lengths, labels, 
+                minibatch_, maxT_, maxU_, alphabet_size_, blank_, fastemit_lambda_);
+        } else {
+            compute_grad_kernel<128, ProbT><<<minibatch_ * maxT_ * maxU_, 128, 0, stream_>>>(grads, 
+                acts, denom, alphas, betas, llForward, input_lengths, label_lengths, labels, 
+                minibatch_, maxT_, maxU_, alphabet_size_, blank_);
+        }
 #if defined(DEBUG_TIME)
         cudaStreamSynchronize(stream_);
         end = std::chrono::high_resolution_clock::now();
