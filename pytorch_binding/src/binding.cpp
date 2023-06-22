@@ -76,7 +76,17 @@ int cpu_rnnt(torch::Tensor acts,
         delete cpu_workspace;
         return 0;
         }
-      default:
+        case torch::ScalarType::Half:
+        {
+            compute_rnnt_loss_half(acts.data<half>(), grads.data<half>(),labels.data<int>(), label_lengths.data<int>(),
+                                   input_lengths.data<int>(), alphabet_size,
+                                   minibatch_size, costs.data<half>(),
+                                   cpu_workspace, options);
+
+            delete cpu_workspace;
+            return 0;
+        }
+        default:
         std::cerr << __FILE__ << ':' << __LINE__ << ": " << "unsupported data type" << std::endl;
     }
     return -1;
@@ -145,6 +155,25 @@ int gpu_rnnt(torch::Tensor acts,
                          labels.data<int>(), label_lengths.data<int>(),
                          input_lengths.data<int>(), alphabet_size,
                          minibatch_size, costs.data<double>(),
+                         gpu_workspace, options);
+
+        c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
+        return 0;
+        }
+        case torch::ScalarType::Half:
+        {
+        size_t gpu_size_bytes;
+        get_workspace_size(maxT, maxU, minibatch_size,
+                           true, &gpu_size_bytes);
+
+        cudaSetDevice(acts.get_device());
+
+        void* gpu_workspace = c10::cuda::CUDACachingAllocator::raw_alloc(gpu_size_bytes);
+
+        compute_rnnt_loss_fp64(acts.data<__half>(), grads.data<__half>(),
+                         labels.data<int>(), label_lengths.data<int>(),
+                         input_lengths.data<int>(), alphabet_size,
+                         minibatch_size, costs.data<__half>(),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
