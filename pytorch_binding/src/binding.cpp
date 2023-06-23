@@ -78,13 +78,18 @@ int cpu_rnnt(torch::Tensor acts,
         }
         case torch::ScalarType::Half:
         {
-            compute_rnnt_loss_half(acts.data<half>(), grads.data<half>(),labels.data<int>(), label_lengths.data<int>(),
-                                   input_lengths.data<int>(), alphabet_size,
-                                   minibatch_size, costs.data<half>(),
-                                   cpu_workspace, options);
+        get_workspace_size(maxT, maxU, minibatch_size,
+                           false, &cpu_size_bytes,
+                           sizeof(half));
 
-            delete cpu_workspace;
-            return 0;
+        half* cpu_workspace = (half*) new unsigned char[cpu_size_bytes];
+        compute_rnnt_loss_half(acts.data<half>(), grads.data<half>(),labels.data<int>(), label_lengths.data<int>(),
+                         input_lengths.data<int>(), alphabet_size,
+                         minibatch_size, costs.data<half>(),
+                         cpu_workspace, options);
+
+        delete cpu_workspace;
+        return 0;
         }
         default:
         std::cerr << __FILE__ << ':' << __LINE__ << ": " << "unsupported data type" << std::endl;

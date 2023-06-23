@@ -173,19 +173,6 @@ CpuRNNT<ProbT>::cost_and_grad_kernel(const ProbT* const log_probs, ProbT* grad,
     return -llForward;
 }
 
-template<typename T>
-inline T neg_inf_cpu() { return -T(INFINITY); }
-
-template<typename T>
-inline T log_sum_exp_cpu(T a, T b) {
-    if (a == neg_inf_cpu<T>()) return b;
-    if (b == neg_inf_cpu<T>()) return a;
-    if (a > b)
-        return log1p(exp(b-a)) + a;
-    else
-        return log1p(exp(a-b)) + b;
-}
-
 template<typename ProbT>
 ProbT
 CpuRNNT<ProbT>::compute_alphas(const ProbT* const log_probs, int T, int U, ProbT* alphas) {
@@ -203,7 +190,7 @@ CpuRNNT<ProbT>::compute_alphas(const ProbT* const log_probs, int T, int U, ProbT
             if (t > 0 && u > 0) {
                 ProbT no_emit = alphas[idx(t-1, u)] + log_probs[idx(t-1, u) * 2];
                 ProbT emit = alphas[idx(t, u-1)] + log_probs[idx(t, u-1) * 2 + 1];
-                alphas[idx(t, u)] = log_sum_exp_cpu<ProbT>(emit, no_emit);
+                alphas[idx(t, u)] = rnnt_helper::log_sum_exp<ProbT>(emit, no_emit);
             }
         }
     }
@@ -244,7 +231,7 @@ CpuRNNT<ProbT>::compute_betas_and_grad(ProbT* grad, const ProbT* const log_probs
             if (t < T-1 && u < U-1) {
                 ProbT no_emit = betas[idx(t+1, u)] + log_probs[idx(t, u) * 2];
                 ProbT emit = betas[idx(t, u+1)] + log_probs[idx(t, u) * 2 + 1];
-                betas[idx(t, u)] = log_sum_exp_cpu<ProbT>(emit, no_emit);
+                betas[idx(t, u)] = rnnt_helper::log_sum_exp<ProbT>(emit, no_emit);
             }
         }
     }

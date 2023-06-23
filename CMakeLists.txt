@@ -44,7 +44,7 @@ if (WITH_OMP)
     set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler -fopenmp")
 endif()
 
-# These comments are necessary to use CUDA math library functions for half type
+# Drop support for old GPU to use CUDA math library functions
 IF(NOT (CUDA_VERSION GREATER 10.2))
 #    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -gencode arch=compute_30,code=sm_30 -O2")
 #    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -gencode arch=compute_35,code=sm_35")
