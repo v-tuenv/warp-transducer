@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cuda_fp16.h>
 #ifdef __cplusplus
 #include <cstddef>
 extern "C" {
@@ -125,6 +126,16 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              void *workspace,
                              rnntOptions options);
 
+rnntStatus_t compute_rnnt_loss_half(const half* const activations,
+                                    half* gradients,
+                                    const int* const flat_labels,
+                                    const int* const label_lengths,
+                                    const int* const input_lengths,
+                                    int alphabet_size,
+                                    int minibatch,
+                                    half *costs,
+                                    void *workspace,
+                                    rnntOptions options);
 
 
 /** For a given set of max sequence length and minibatch size return the required 

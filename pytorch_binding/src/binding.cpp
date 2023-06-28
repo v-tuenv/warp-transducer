@@ -51,10 +51,10 @@ int cpu_rnnt(torch::Tensor acts,
                            false, &cpu_size_bytes);
 
         float* cpu_workspace = (float*) new unsigned char[cpu_size_bytes];
-        compute_rnnt_loss(acts.data<float>(), grads.data<float>(),
-                         labels.data<int>(), label_lengths.data<int>(),
-                         input_lengths.data<int>(), alphabet_size,
-                         minibatch_size, costs.data<float>(),
+        compute_rnnt_loss(acts.data_ptr<float>(), grads.data_ptr<float>(),
+                         labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                         input_lengths.data_ptr<int>(), alphabet_size,
+                         minibatch_size, costs.data_ptr<float>(),
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -67,10 +67,10 @@ int cpu_rnnt(torch::Tensor acts,
                            sizeof(double));
 
         double* cpu_workspace = (double*) new unsigned char[cpu_size_bytes];
-        compute_rnnt_loss_fp64(acts.data<double>(), grads.data<double>(),
-                         labels.data<int>(), label_lengths.data<int>(),
-                         input_lengths.data<int>(), alphabet_size,
-                         minibatch_size, costs.data<double>(),
+        compute_rnnt_loss_fp64(acts.data_ptr<double>(), grads.data_ptr<double>(),
+                         labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                         input_lengths.data_ptr<int>(), alphabet_size,
+                         minibatch_size, costs.data_ptr<double>(),
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -122,10 +122,10 @@ int gpu_rnnt(torch::Tensor acts,
 
         void* gpu_workspace = c10::cuda::CUDACachingAllocator::raw_alloc(gpu_size_bytes);
 
-        compute_rnnt_loss(acts.data<float>(), grads.data<float>(),
-                         labels.data<int>(), label_lengths.data<int>(),
-                         input_lengths.data<int>(), alphabet_size,
-                         minibatch_size, costs.data<float>(),
+        compute_rnnt_loss(acts.data_ptr<float>(), grads.data_ptr<float>(),
+                         labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                         input_lengths.data_ptr<int>(), alphabet_size,
+                         minibatch_size, costs.data_ptr<float>(),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
@@ -141,10 +141,10 @@ int gpu_rnnt(torch::Tensor acts,
 
         void* gpu_workspace = c10::cuda::CUDACachingAllocator::raw_alloc(gpu_size_bytes);
 
-        compute_rnnt_loss_fp64(acts.data<double>(), grads.data<double>(),
-                         labels.data<int>(), label_lengths.data<int>(),
-                         input_lengths.data<int>(), alphabet_size,
-                         minibatch_size, costs.data<double>(),
+        compute_rnnt_loss_fp64(acts.data_ptr<double>(), grads.data_ptr<double>(),
+                         labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                         input_lengths.data_ptr<int>(), alphabet_size,
+                         minibatch_size, costs.data_ptr<double>(),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
@@ -160,10 +160,10 @@ int gpu_rnnt(torch::Tensor acts,
 
         void* gpu_workspace = c10::cuda::CUDACachingAllocator::raw_alloc(gpu_size_bytes);
 
-        compute_rnnt_loss_fp64(acts.data<__half>(), grads.data<__half>(),
-                         labels.data<int>(), label_lengths.data<int>(),
-                         input_lengths.data<int>(), alphabet_size,
-                         minibatch_size, costs.data<__half>(),
+        compute_rnnt_loss_half(acts.data_ptr<half>(), grads.data_ptr<half>(),
+                         labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                         input_lengths.data_ptr<int>(), alphabet_size,
+                         minibatch_size, costs.data_ptr<half>(),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
