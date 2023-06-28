@@ -44,7 +44,7 @@ int cpu_rnnt(torch::Tensor acts,
 #endif
 
     size_t cpu_size_bytes = 0;
-    switch (acts.type().scalarType()) {
+    switch (acts.scalar_type()) {
       case torch::ScalarType::Float:
         {
         get_workspace_size(maxT, maxU, minibatch_size,
@@ -111,7 +111,7 @@ int gpu_rnnt(torch::Tensor acts,
     options.num_threads = std::max(options.num_threads, (unsigned int) 1);
 #endif
 
-    switch (acts.type().scalarType()) {
+    switch (acts.scalar_type()) {
       case torch::ScalarType::Float:
         {
         size_t gpu_size_bytes;
