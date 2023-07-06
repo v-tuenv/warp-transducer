@@ -6,6 +6,18 @@
 
 #ifdef WARPRNNT_ENABLE_GPU
     #include "c10/cuda/CUDACachingAllocator.h"
+#include <cuda_fp16.h>
+
+rnntStatus_t compute_rnnt_loss_half(const half* const activations,
+                                    half* gradients,
+                                    const int* const flat_labels,
+                                    const int* const label_lengths,
+                                    const int* const input_lengths,
+                                    int alphabet_size,
+                                    int minibatch,
+                                    half *costs,
+                                    void *workspace,
+                                    rnntOptions options);
 #endif
 
 int cpu_rnnt(torch::Tensor acts,
