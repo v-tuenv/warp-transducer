@@ -15,6 +15,16 @@ IF (APPLE)
     add_definitions(-DAPPLE)
 ENDIF()
 
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+
+    # to tell your code it was found via #ifdef USE_CUDA:
+    add_definitions(-DUSE_CUDA)
+
+    include_directories("${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
+endif()
+
 include_directories(include)
 
 FIND_PACKAGE(CUDA)
