@@ -127,7 +127,7 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              void *workspace,
                              rnntOptions options);
 
-#ifdef WARPRNNT_ENABLE_GPU
+/*#ifdef WARPRNNT_ENABLE_GPU
 #include "c10/util/Half.h"
 
 rnntStatus_t compute_rnnt_loss_half(const half* const activations,
@@ -141,7 +141,7 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     void *workspace,
                                     rnntOptions options);
 
-#endif
+#endif*/
 
 
 /** For a given set of max sequence length and minibatch size return the required
