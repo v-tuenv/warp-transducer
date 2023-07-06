@@ -10,9 +10,6 @@
 extern "C" {
 #endif
 
-#ifdef WARPRNNT_ENABLE_GPU
-#include <cuda_fp16.h>
-#endif
 //forward declare of CUDA typedef to avoid needing to pull in CUDA headers
 typedef struct CUstream_st* CUstream;
 
@@ -128,6 +125,9 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              void *workspace,
                              rnntOptions options);
 
+#ifdef WARPRNNT_ENABLE_GPU
+#include <cuda_fp16.h>
+
 rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     half* gradients,
                                     const int* const flat_labels,
@@ -138,6 +138,7 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     half *costs,
                                     void *workspace,
                                     rnntOptions options);
+#endif
 
 
 /** For a given set of max sequence length and minibatch size return the required 
