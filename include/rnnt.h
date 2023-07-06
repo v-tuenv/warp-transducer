@@ -6,11 +6,13 @@
 #pragma once
 
 #ifdef __cplusplus
-#include <cuda_fp16.h>
 #include <cstddef>
 extern "C" {
 #endif
 
+#ifdef WARPRNNT_ENABLE_GPU
+#include <cuda_fp16.h>
+#endif
 //forward declare of CUDA typedef to avoid needing to pull in CUDA headers
 typedef struct CUstream_st* CUstream;
 
