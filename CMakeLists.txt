@@ -15,6 +15,7 @@ IF (APPLE)
     add_definitions(-DAPPLE)
 ENDIF()
 
+include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
     enable_language(CUDA)
