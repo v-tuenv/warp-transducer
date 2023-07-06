@@ -5,8 +5,8 @@
 
 #pragma once
 
-//#include <cuda_fp16.h>
 #ifdef __cplusplus
+#include <cuda_fp16.h>
 #include <cstddef>
 extern "C" {
 #endif
