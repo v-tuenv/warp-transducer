@@ -10,11 +10,10 @@
 extern "C" {
 #endif
 
-//#include <cuda_fp16.h>
+#include <cuda_fp16.h>
 
 //forward declare of CUDA typedef to avoid needing to pull in CUDA headers
 typedef struct CUstream_st* CUstream;
-typedef struct half half;
 
 typedef enum {
     RNNT_STATUS_SUCCESS = 0,
