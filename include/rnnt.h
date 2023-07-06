@@ -5,12 +5,13 @@
 
 #pragma once
 
+#include <cuda_fp16.h>
+
 #ifdef __cplusplus
 #include <cstddef>
 extern "C" {
 #endif
 
-#include <cuda_fp16.h>
 
 //forward declare of CUDA typedef to avoid needing to pull in CUDA headers
 typedef struct CUstream_st* CUstream;
