@@ -5,7 +5,11 @@
 
 #pragma once
 
-#include "cuda_fp16.h"
+//#include "cuda_fp16.h"
+
+#ifdef WARPRNNT_ENABLE_GPU
+    #include "c10/util/Half.h"
+#endif
 
 #ifdef __cplusplus
 #include <cstddef>
