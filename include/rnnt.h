@@ -7,9 +7,6 @@
 
 //#include "cuda_fp16.h"
 
-#ifdef WARPRNNT_ENABLE_GPU
-    #include "c10/util/Half.h"
-#endif
 
 #ifdef __cplusplus
 #include <cstddef>
@@ -132,6 +129,9 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              void *workspace,
                              rnntOptions options);
 
+#ifdef WARPRNNT_ENABLE_GPU
+#include "c10/util/Half.h"
+
 rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     half* gradients,
                                     const int* const flat_labels,
@@ -143,8 +143,10 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     void *workspace,
                                     rnntOptions options);
 
+#endif
 
-/** For a given set of max sequence length and minibatch size return the required 
+
+/** For a given set of max sequence length and minibatch size return the required
  *  workspace size. This will need to be allocated in the same memory space as your
  *  probabilities.
  * \param [in]  mini_batch How many examples in a minibatch.
