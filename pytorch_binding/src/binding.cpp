@@ -160,10 +160,10 @@ int gpu_rnnt(torch::Tensor acts,
 
         void* gpu_workspace = c10::cuda::CUDACachingAllocator::raw_alloc(gpu_size_bytes);
 
-        compute_rnnt_loss_half(acts.data_ptr<at::Half>(), grads.data_ptr<at::Half>(),
+        compute_rnnt_loss_half((half*)(acts.data_ptr<at::Half>()), (half*)(grads.data_ptr<at::Half>()),
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
-                         minibatch_size, costs.data_ptr<at::Half>(),
+                         minibatch_size, (half*)(costs.data_ptr<at::Half>()),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
