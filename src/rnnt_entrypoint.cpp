@@ -196,7 +196,7 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations, //BTUV
                                     half *costs,
                                     void *workspace,
                                     rnntOptions options) {
-  /*if (activations == nullptr ||
+  if (activations == nullptr ||
       flat_labels == nullptr ||
       label_lengths == nullptr ||
       input_lengths == nullptr ||
@@ -231,8 +231,7 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations, //BTUV
 #endif
   } else {
     return RNNT_STATUS_INVALID_VALUE;
-  }*/
-  return RNNT_STATUS_INVALID_VALUE;
+  }
 }
 
 }
