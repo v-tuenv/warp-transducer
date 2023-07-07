@@ -126,7 +126,7 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              rnntOptions options);
 
 #ifdef WARPRNNT_ENABLE_GPU
-#include "c10/util/Half.h"
+#include <cuda_fp16.h>
 
 rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     half* gradients,
