@@ -150,7 +150,7 @@ int gpu_rnnt(torch::Tensor acts,
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
         return 0;
         }
-      /*case torch::ScalarType::Half:
+      case torch::ScalarType::Bool:
         {
         size_t gpu_size_bytes;
         get_workspace_size(maxT, maxU, minibatch_size,
@@ -168,7 +168,7 @@ int gpu_rnnt(torch::Tensor acts,
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
         return 0;
-        }*/
+        }
       default:
         std::cerr << __FILE__ << ':' << __LINE__ << ": " << "unsupported data type" << std::endl;
     }
