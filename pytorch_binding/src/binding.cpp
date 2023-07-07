@@ -152,7 +152,7 @@ int gpu_rnnt(torch::Tensor acts,
         }
       case torch::ScalarType::Half:
         {
-            acts.data_ptr<half>();
+            acts.data_ptr<at:Half>();
         /*size_t gpu_size_bytes;
         get_workspace_size(maxT, maxU, minibatch_size,
                            true, &gpu_size_bytes);
