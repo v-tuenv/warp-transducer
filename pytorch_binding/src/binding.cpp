@@ -14,6 +14,8 @@ int cpu_rnnt(torch::Tensor acts,
             torch::Tensor label_lengths,
             torch::Tensor costs,
             torch::Tensor grads,
+            torch::Tensor alphas,
+            torch::Tensor betas,
             int blank_label,
             float fastemit_lambda,
             int num_threads) {
@@ -55,6 +57,8 @@ int cpu_rnnt(torch::Tensor acts,
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
                          minibatch_size, costs.data_ptr<float>(),
+                         alphas.data_ptr<float>(), 
+                         betas.data_ptr<float>(),
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -71,6 +75,8 @@ int cpu_rnnt(torch::Tensor acts,
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
                          minibatch_size, costs.data_ptr<double>(),
+                         alphas.data_ptr<double>(), 
+                         betas.data_ptr<double>(),
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -88,6 +94,8 @@ int gpu_rnnt(torch::Tensor acts,
             torch::Tensor label_lengths,
             torch::Tensor costs,
             torch::Tensor grads,
+            torch::Tensor alphas,
+            torch::Tensor betas,
             int blank_label,
             float fastemit_lambda,
             int num_threads) {
@@ -125,7 +133,8 @@ int gpu_rnnt(torch::Tensor acts,
         compute_rnnt_loss(acts.data_ptr<float>(), grads.data_ptr<float>(),
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
-                         minibatch_size, costs.data_ptr<float>(),
+                         minibatch_size, costs.data_ptr<float>(), alphas.data_ptr<float>(), 
+                         betas.data_ptr<float>(), 
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
@@ -145,6 +154,8 @@ int gpu_rnnt(torch::Tensor acts,
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
                          minibatch_size, costs.data_ptr<double>(),
+                         alphas.data_ptr<double>(), 
+                         betas.data_ptr<double>(), 
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
@@ -164,6 +175,8 @@ int gpu_rnnt(torch::Tensor acts,
                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
                          input_lengths.data_ptr<int>(), alphabet_size,
                          minibatch_size, (half*)(costs.data_ptr<at::Half>()),
+                         (half*)(alphas.data_ptr<at::Half>()),
+                         (half*)(betas.data_ptr<at::Half>()),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);

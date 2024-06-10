@@ -111,6 +111,8 @@ rnntStatus_t compute_rnnt_loss(const float* const activations,
                              int alphabet_size,
                              int minibatch,
                              float *costs,
+                             float *alphas,
+                             float *betas,
                              void *workspace,
                              rnntOptions options);
 
@@ -122,6 +124,8 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations,
                              int alphabet_size,
                              int minibatch,
                              double *costs,
+                             double *alphas,
+                             double *betas,
                              void *workspace,
                              rnntOptions options);
 
@@ -135,7 +139,8 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations,
                                     const int* const input_lengths,
                                     int alphabet_size,
                                     int minibatch,
-                                    half *costs,
+                                    half *costs,half *alphas,
+                                    half *betas,
                                     void *workspace,
                                     rnntOptions options);
 #endif

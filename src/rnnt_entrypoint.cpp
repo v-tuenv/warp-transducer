@@ -43,6 +43,8 @@ rnntStatus_t compute_rnnt_loss(const float* const activations, //BTUV
                              int alphabet_size,
                              int minibatch,
                              float *costs,
+                             float *alphas,
+                             float *betas,
                              void *workspace,
                              rnntOptions options) {
 
@@ -66,10 +68,11 @@ rnntStatus_t compute_rnnt_loss(const float* const activations, //BTUV
         if (gradients != NULL)
             return rnnt.cost_and_grad(activations, gradients,
                                         costs,
+                                        alphas, betas,
                                         flat_labels, label_lengths,
                                         input_lengths);
         else
-            return rnnt.score_forward(activations, costs, flat_labels,
+            return rnnt.score_forward(activations, costs, alphas, betas, flat_labels,
                                         label_lengths, input_lengths);
     } else if (options.loc == RNNT_GPU) {
 #ifdef __CUDACC__
@@ -79,10 +82,13 @@ rnntStatus_t compute_rnnt_loss(const float* const activations, //BTUV
         if (gradients != NULL)
             return rnnt.cost_and_grad(activations, gradients,
                                         costs,
+                                        alphas,
+                                        betas,
                                         flat_labels, label_lengths,
                                         input_lengths);
         else
-            return rnnt.score_forward(activations, costs, flat_labels,
+            return rnnt.score_forward(activations, costs, alphas,
+                                        betas, flat_labels,
                                         label_lengths, input_lengths);
 #else
         std::cerr << "GPU execution requested, but not compiled with GPU support" << std::endl;
@@ -136,6 +142,8 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations, //BTUV
                              int alphabet_size,
                              int minibatch,
                              double *costs,
+                             double *alphas,
+                             double *betas,
                              void *workspace,
                              rnntOptions options) {
 
@@ -159,10 +167,11 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations, //BTUV
         if (gradients != NULL)
             return rnnt.cost_and_grad(activations, gradients,
                                         costs,
+                                        alphas, betas,
                                         flat_labels, label_lengths,
                                         input_lengths);
         else
-            return rnnt.score_forward(activations, costs, flat_labels,
+            return rnnt.score_forward(activations, costs, alphas, betas, flat_labels,
                                         label_lengths, input_lengths);
     } else if (options.loc == RNNT_GPU) {
 #ifdef __CUDACC__
@@ -172,10 +181,12 @@ rnntStatus_t compute_rnnt_loss_fp64(const double* const activations, //BTUV
         if (gradients != NULL)
             return rnnt.cost_and_grad(activations, gradients,
                                         costs,
+                                        alphas, betas,
                                         flat_labels, label_lengths,
                                         input_lengths);
         else
-            return rnnt.score_forward(activations, costs, flat_labels,
+            return rnnt.score_forward(activations, costs, alphas,
+                                        betas, flat_labels,
                                         label_lengths, input_lengths);
 #else
         std::cerr << "GPU execution requested, but not compiled with GPU support" << std::endl;
@@ -194,6 +205,8 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations, //BTUV
                                     int alphabet_size,
                                     int minibatch,
                                     half *costs,
+                                    half *alphas,
+                                    half *betas,
                                     void *workspace,
                                     rnntOptions options) {
 
@@ -221,10 +234,13 @@ rnntStatus_t compute_rnnt_loss_half(const half* const activations, //BTUV
         if (gradients != NULL)
             return rnnt.cost_and_grad(activations, gradients,
                                         costs,
+                                        alphas,
+                                        betas,
                                         flat_labels, label_lengths,
                                         input_lengths);
         else
-            return rnnt.score_forward(activations, costs, flat_labels,
+            return rnnt.score_forward(activations, costs, alphas,
+                                        betas, flat_labels,
                                         label_lengths, input_lengths);
 #else
     std::cerr << "GPU execution requested, but not compiled with GPU support" << std::endl;
