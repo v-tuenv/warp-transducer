@@ -18,6 +18,8 @@ bool run_test(int B, int T, int L, int A, int num_threads) {
     auto start = std::chrono::high_resolution_clock::now();
     int len = B * T * (L + 1) * A;
     float * acts = genActs(len);
+    float * alphas = genActs(len);
+    float * betas = genActs(len);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
     std::cout << "genActs elapsed time: " << elapsed.count() * 1000 << " ms\n";
@@ -64,6 +66,8 @@ bool run_test(int B, int T, int L, int A, int num_threads) {
                                         sizes.data(),
                                         A, B,
                                         costs.data(),
+                                        alphas,
+                                        betas,
                                         rnnt_cpu_workspace,
                                         options),
                         "Error: compute_rnnt_loss (0) in run_test");

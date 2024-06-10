@@ -14,6 +14,8 @@ int cpu_rnnt(torch::Tensor acts,
             torch::Tensor label_lengths,
             torch::Tensor costs,
             torch::Tensor grads,
+            torch::Tensor alphas,
+            torch::Tensor betas,
             int blank_label,
             float fastemit_lambda,
             int num_threads) {
@@ -55,6 +57,9 @@ int cpu_rnnt(torch::Tensor acts,
                          labels.data<int>(), label_lengths.data<int>(),
                          input_lengths.data<int>(), alphabet_size,
                          minibatch_size, costs.data<float>(),
+                         alphas.data<float>(),
+                         betas.data<float>(),
+                         
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -71,6 +76,9 @@ int cpu_rnnt(torch::Tensor acts,
                          labels.data<int>(), label_lengths.data<int>(),
                          input_lengths.data<int>(), alphabet_size,
                          minibatch_size, costs.data<double>(),
+                         alphas.data<double>(),
+                         betas.data<double>(),
+                         
                          cpu_workspace, options);
 
         delete cpu_workspace;
@@ -88,6 +96,8 @@ int gpu_rnnt(torch::Tensor acts,
             torch::Tensor label_lengths,
             torch::Tensor costs,
             torch::Tensor grads,
+            torch::Tensor alphas,
+            torch::Tensor betas,
             int blank_label,
             float fastemit_lambda,
             int num_threads) {
@@ -126,6 +136,9 @@ int gpu_rnnt(torch::Tensor acts,
                          labels.data<int>(), label_lengths.data<int>(),
                          input_lengths.data<int>(), alphabet_size,
                          minibatch_size, costs.data<float>(),
+                         alphas.data<float>(),
+                         betas.data<float>(),
+                         
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);
@@ -145,6 +158,8 @@ int gpu_rnnt(torch::Tensor acts,
                          labels.data<int>(), label_lengths.data<int>(),
                          input_lengths.data<int>(), alphabet_size,
                          minibatch_size, costs.data<double>(),
+                         alphas.data<double>(),
+                         betas.data<double>(),
                          gpu_workspace, options);
 
         c10::cuda::CUDACachingAllocator::raw_delete(gpu_workspace);

@@ -36,4 +36,3 @@ genLabels(int alphabet_size, int L) {
     }
     return label;
 }
-

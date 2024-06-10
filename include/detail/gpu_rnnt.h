@@ -41,6 +41,9 @@ public:
     rnntStatus_t compute_cost_and_score(const ProbT* const acts,
                                         ProbT* grad,
                                         ProbT* costs,
+
+                                        ProbT* alphas,
+                                        ProbT* betas,
                                         const int* const pad_labels,
                                         const int* const label_lengths,
                                         const int* const input_lengths);
@@ -48,12 +51,16 @@ public:
     rnntStatus_t cost_and_grad(const ProbT* const acts,
                               ProbT* grad,
                               ProbT* costs,
+                              ProbT* alphas,
+                              ProbT* betas,
                               const int* const pad_labels,
                               const int* const label_lengths,
                               const int* const input_lengths);
 
     rnntStatus_t score_forward(const ProbT* const acts,
                               ProbT* costs,
+                              ProbT* alphas,
+                              ProbT* betas,
                               const int* const pad_labels,
                               const int* const label_lengths,
                               const int* const input_lengths);
@@ -85,6 +92,8 @@ rnntStatus_t
 GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
                                     ProbT* grads,
                                     ProbT* costs,
+                                    ProbT* alphas,
+                                    ProbT* betas,
                                     const int* const labels,
                                     const int* const label_lengths,
                                     const int* const input_lengths) {
@@ -95,10 +104,10 @@ GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
     ProbT* denom = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
     bytes_used += sizeof(ProbT) * maxT_ * maxU_ * minibatch_;
     // alphas & betas
-    ProbT* alphas = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
-    bytes_used += sizeof(ProbT) * maxT_ * maxU_ * minibatch_;
-    ProbT* betas = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
-    bytes_used += sizeof(ProbT) * maxT_ * maxU_ * minibatch_;
+    // ProbT* alphas = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
+    // bytes_used += sizeof(ProbT) * maxT_ * maxU_ * minibatch_;
+    // ProbT* betas = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
+    // bytes_used += sizeof(ProbT) * maxT_ * maxU_ * minibatch_;
     // logllh
     ProbT* llForward = reinterpret_cast<ProbT*>(static_cast<char*>(gpu_workspace) + bytes_used);
     bytes_used += sizeof(ProbT) * minibatch_;
@@ -109,6 +118,9 @@ GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
         // zero grads
         cudaMemsetAsync(grads, 0, sizeof(ProbT) * minibatch_ * maxT_ * maxU_ * alphabet_size_, stream_);
     }
+    cudaMemsetAsync(alphas, 0, sizeof(ProbT) * minibatch_ * maxT_ * maxU_ , stream_);
+    cudaMemsetAsync(betas, 0, sizeof(ProbT) * minibatch_ * maxT_ * maxU_ , stream_);
+
     // denom
 #if defined(DEBUG_TIME)
      auto start = std::chrono::high_resolution_clock::now();
@@ -155,8 +167,6 @@ GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
         printf("\n");
     }
 #endif
-    if (training) {
-        // betas
 #if defined(DEBUG_TIME)
         start = std::chrono::high_resolution_clock::now();
 #endif
@@ -173,6 +183,9 @@ GpuRNNT<ProbT>::compute_cost_and_score(const ProbT* const acts,
         elapsed = end - start;
         std::cout << "DEBUG: compute_betas_kernel " << elapsed.count() * 1000 << " ms\n";
 #endif
+    if (training) {
+        // betas
+
 #if defined(DEBUG_KERNEL)
     ProbT* cpu_betas = new ProbT[minibatch_ * maxT_ * maxU_];
     cudaMemcpy(cpu_betas, betas, sizeof(ProbT) * minibatch_ * maxT_ * maxU_, cudaMemcpyDeviceToHost);
@@ -227,6 +240,8 @@ rnntStatus_t
 GpuRNNT<ProbT>::cost_and_grad(const ProbT* const acts,
                        ProbT* grads,
                        ProbT* costs,
+                       ProbT* alphas,
+                       ProbT* betas,
                        const int* const pad_labels,
                        const int* const label_lengths,
                        const int* const input_lengths) {
@@ -239,13 +254,18 @@ GpuRNNT<ProbT>::cost_and_grad(const ProbT* const acts,
         input_lengths == nullptr)
         return RNNT_STATUS_INVALID_VALUE;
 
-    return compute_cost_and_score(acts, grads, costs, pad_labels, label_lengths, input_lengths);
+    return compute_cost_and_score(acts, grads, costs, 
+                                    alphas,
+                                    betas,pad_labels, label_lengths, input_lengths);
 }
 
 template<typename ProbT>
 rnntStatus_t
 GpuRNNT<ProbT>::score_forward(const ProbT* const acts,
                        ProbT* costs,
+
+                                    ProbT* alphas,
+                                    ProbT* betas,
                        const int* const pad_labels,
                        const int* const label_lengths,
                        const int* const input_lengths) {
@@ -257,5 +277,7 @@ GpuRNNT<ProbT>::score_forward(const ProbT* const acts,
         input_lengths == nullptr)
         return RNNT_STATUS_INVALID_VALUE;
 
-    return compute_cost_and_score(acts, nullptr, costs, pad_labels, label_lengths, input_lengths);
+    return compute_cost_and_score(acts, nullptr, costs, 
+                                    alphas,
+                                    betas,pad_labels, label_lengths, input_lengths);
 }

@@ -38,7 +38,7 @@ bool small_test() {
     lengths.push_back(T);
 
     float score;
-
+    
     rnntOptions options{};
     options.maxT = T;
     options.maxU = U;
@@ -49,8 +49,12 @@ bool small_test() {
     options.stream = stream;
     options.num_threads = 1;
 
+    float* alphas;
+    float* betas;
     float* acts_gpu;
     vector_to_gpu(acts_gpu, acts, stream);
+    vector_to_gpu(alphas, acts, stream);
+    vector_to_gpu(betas, acts, stream);
     int* label_gpu;
     vector_to_gpu(label_gpu, labels, stream);
     int* label_length_gpu;
@@ -75,10 +79,13 @@ bool small_test() {
                                     alphabet_size,
                                     lengths.size(),
                                     &score,
+                                    alphas,
+                                    betas,
                                     rnnt_gpu_workspace,
                                     options),
                    "Error: compute_rnnt_loss in small_test");
-
+    cudaFree(alphas);
+    cudaFree(betas);
     cudaFree(rnnt_gpu_workspace);
     cudaFree(acts_gpu);
     cudaFree(label_gpu);
@@ -140,7 +147,8 @@ bool options_test() {
 
     std::vector<float> grads(acts.size());
     std::vector<float> scores(2);
-
+    std::vector<float> alphas(acts);
+    std::vector<float> betas(acts);
     rnntOptions options{};
     options.maxT = T;
     options.maxU = L;
@@ -178,6 +186,8 @@ bool options_test() {
                                     alphabet_size,
                                     lengths.size(),
                                     scores.data(),
+                                    alphas.data(),
+                                    betas.data(),
                                     rnnt_gpu_workspace,
                                     options),
                    "Error: compute_rnnt_loss in small_test");
@@ -245,7 +255,8 @@ bool inf_test() {
     std::vector<float> grads(acts.size());
 
     float cost;
-
+    float* alphas;
+    float* betas;
     rnntOptions options{};
     options.maxT = T;
     options.maxU = L;
@@ -257,6 +268,8 @@ bool inf_test() {
 
     float* acts_gpu;
     vector_to_gpu(acts_gpu, acts, stream);
+    vector_to_gpu(alphas, acts, stream);
+    vector_to_gpu(betas, acts, stream);
     float* grads_gpu;
     cudaMalloc(&grads_gpu, grads.size() * sizeof(float));
     int* label_gpu;
@@ -283,12 +296,15 @@ bool inf_test() {
                                     alphabet_size,
                                     sizes.size(),
                                     &cost,
+                                    alphas,
+                                    betas,
                                     rnnt_gpu_workspace,
                                     options),
                    "Error: compute_rnnt_loss in small_test");
 
     cudaMemcpyAsync(grads.data(), grads_gpu, grads.size() * sizeof(float), cudaMemcpyDeviceToHost, stream);
-
+    cudaFree(alphas);
+    cudaFree(betas);
     cudaFree(rnnt_gpu_workspace);
     cudaFree(acts_gpu);
     cudaFree(grads_gpu);
@@ -306,7 +322,7 @@ bool inf_test() {
 }
 
 void numeric_grad(float* acts, int* flat_labels, int* label_lengths,
-                int* sizes, int alphabet_size, int minibatch, 
+                int* sizes, float* alphas, float* betas, int alphabet_size, int minibatch, 
                 void* rnnt_gpu_workspace, rnntOptions& options, std::vector<float>& num_grad) {
 
     float epsilon = 1e-2;
@@ -316,7 +332,8 @@ void numeric_grad(float* acts, int* flat_labels, int* label_lengths,
 
         std::vector<float> costsP1(minibatch);
         std::vector<float> costsP2(minibatch);
-
+        // std::vector<float> alphas(minibatch * )
+        // float alphas, betas;
         cudaMemcpy(&act, &acts[i], sizeof(float), cudaMemcpyDeviceToHost);
         act += epsilon;
         cudaMemcpy(&acts[i], &act, sizeof(float), cudaMemcpyHostToDevice);
@@ -328,6 +345,8 @@ void numeric_grad(float* acts, int* flat_labels, int* label_lengths,
                                         alphabet_size,
                                         minibatch,
                                         costsP1.data(),
+                                        alphas,
+                                        betas,
                                         rnnt_gpu_workspace,
                                         options),
                        "Error: compute_rnnt_loss (1) in grad_check");
@@ -343,6 +362,8 @@ void numeric_grad(float* acts, int* flat_labels, int* label_lengths,
                                         alphabet_size,
                                         minibatch,
                                         costsP2.data(),
+                                        alphas,
+                                        betas,
                                         rnnt_gpu_workspace,
                                         options),
                        "Error: compute_rnnt_loss (2) in grad_check");
@@ -374,7 +395,7 @@ bool grad_check(int T, int L, int alphabet_size,
     std::vector<float> costs(minibatch);
 
     std::vector<float> grads(acts.size());
-
+  
     rnntOptions options{};
     options.maxT = T;
     options.maxU = L;
@@ -386,6 +407,10 @@ bool grad_check(int T, int L, int alphabet_size,
 
     float* acts_gpu;
     vector_to_gpu(acts_gpu, acts, stream);
+    float* alphas;
+    vector_to_gpu(alphas, acts, stream);
+    float* betas;
+    vector_to_gpu(betas, acts, stream);
     float* grads_gpu;
     cudaMalloc(&grads_gpu, grads.size() * sizeof(float));
     int* label_gpu;
@@ -413,6 +438,8 @@ bool grad_check(int T, int L, int alphabet_size,
                                     alphabet_size,
                                     sizes.size(),
                                     costs.data(),
+                                    alphas,
+                                    betas,
                                     rnnt_gpu_workspace,
                                     options),
                    "Error: compute_rnnt_loss (0) in grad_check");
@@ -424,10 +451,13 @@ bool grad_check(int T, int L, int alphabet_size,
     std::vector<float> num_grad(grads.size());
 
     //perform 2nd order central differencing
-    numeric_grad(acts_gpu, label_gpu, label_length_gpu, input_length_gpu,
+    numeric_grad(
+            acts_gpu, label_gpu, label_length_gpu, input_length_gpu, alphas, betas,
             alphabet_size, minibatch, rnnt_gpu_workspace, options, num_grad);
 
+    cudaFree(alphas);
     cudaFree(acts_gpu);
+    cudaFree(betas);
     cudaFree(rnnt_gpu_workspace);
     cudaFree(grads_gpu);
     cudaFree(label_gpu);

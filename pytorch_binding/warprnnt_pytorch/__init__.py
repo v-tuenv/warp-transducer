@@ -23,6 +23,8 @@ class _RNNT(Function):
 
         loss_func = warp_rnnt.gpu_rnnt if is_cuda else warp_rnnt.cpu_rnnt
         grads = torch.zeros_like(acts) if acts.requires_grad else torch.zeros(0).to(acts)
+        alphas = torch.zeros_like(acts) 
+        betas = torch.zeros_like(acts) 
         minibatch_size = acts.size(0)
         costs = torch.zeros(minibatch_size, dtype=acts.dtype)
         loss_func(acts,
@@ -31,6 +33,8 @@ class _RNNT(Function):
                   label_lens,
                   costs,
                   grads,
+                  alphas,
+                  betas,
                   blank,
                   fastemit_lambda,
                   0)
@@ -44,10 +48,10 @@ class _RNNT(Function):
         costs = costs.to(acts.device)
         ctx.grads = grads
 
-        return costs
+        return costs, alphas, betas
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output, dx, dy):
         grad_output = grad_output.view(-1, 1, 1, 1).to(ctx.grads)
         return ctx.grads.mul_(grad_output), None, None, None, None, None, None
 
@@ -101,8 +105,8 @@ class RNNTLoss(Module):
             # log_softmax is computed within GPU version.
             acts = torch.nn.functional.log_softmax(acts, -1)
 
-        return self.loss(acts, labels, act_lens, label_lens, self.blank, self.reduction, self.fastemit_lambda)
-
+        loss, alphas, betas = self.loss(acts, labels, act_lens, label_lens, self.blank, self.reduction, self.fastemit_lambda)
+        return (loss, alphas, betas)
 
 def check_type(var, t, name):
     if var.dtype is not t:
@@ -142,4 +146,3 @@ def certify_inputs(log_probs, labels, lengths, label_lengths):
         raise ValueError("Input length mismatch")
     if U != max_U + 1:
         raise ValueError("Output length mismatch")
-

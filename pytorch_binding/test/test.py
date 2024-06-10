@@ -41,7 +41,7 @@ def wrap_and_call(acts, labels):
         lengths = lengths.cuda(gpu)
         label_lengths = label_lengths.cuda(gpu)
 
-    costs = fn(acts, labels, lengths, label_lengths)
+    costs = fn(acts, labels, lengths, label_lengths)[0]
     cost = torch.sum(costs)
     cost.backward()
     # print(repr(acts.grad.data.cpu().numpy()))

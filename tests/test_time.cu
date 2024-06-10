@@ -62,7 +62,12 @@ bool run_test(int B, int T, int L, int A, int num_threads) {
     options.num_threads = num_threads;
 
     float* acts_gpu;
+    float* alphas;
+    float* betas;
     vector_to_gpu<float>(acts_gpu, acts, len, stream);
+    vector_to_gpu<float>(alphas, acts, len, stream);
+    vector_to_gpu<float>(betas, acts, len, stream);
+
     // cudaMalloc(&acts_gpu, len * sizeof(float));
     // cudaMemcpyAsync(acts_gpu, acts, len * sizeof(float), cudaMemcpyHostToDevice, stream);
     float* grads_gpu;
@@ -97,6 +102,8 @@ bool run_test(int B, int T, int L, int A, int num_threads) {
                                         input_length_gpu,
                                         A, B,
                                         costs.data(),
+                                        alphas,
+                                        betas,
                                         rnnt_gpu_workspace,
                                         options),
                         "Error: compute_rnnt_loss (0) in run_test");
@@ -112,7 +119,8 @@ bool run_test(int B, int T, int L, int A, int num_threads) {
     cudaFree(label_gpu);
     cudaFree(label_length_gpu);
     cudaFree(input_length_gpu);
-
+    cudaFree(alphas);
+    cudaFree(betas);
     float sum = 0;
     for (int i = 0; i < 10; ++i) {
         sum += time[i];

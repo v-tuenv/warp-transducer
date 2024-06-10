@@ -1,0 +1,11 @@
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/warprnnt.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_time_gpu.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_gpu.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_cpu.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_time.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/edit_cache.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/rebuild_cache.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/list_install_components.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/install.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/install/local.dir
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/install/strip.dir
