@@ -1,1 +1,1 @@
-/usr/bin/c++ -fPIC  -O2 -fopenmp -shared -Wl,-soname,libwarprnnt.so -o libwarprnnt.so CMakeFiles/warprnnt.dir/src/warprnnt_generated_rnnt_entrypoint.cu.o  -Wl,-Bstatic -lcudart_static -Wl,-Bdynamic -ldl -lrt -lpthread 
+/usr/bin/c++ -fPIC  -O2 -fopenmp -shared -Wl,-soname,libwarprnnt.so -o libwarprnnt.so CMakeFiles/warprnnt.dir/src/warprnnt_generated_rnnt_entrypoint.cu.o  /home/thanhtvt/miniconda3/lib/libcudart_static.a -ldl -lrt -lpthread 

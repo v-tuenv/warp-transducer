@@ -57,12 +57,12 @@ if(NOT generated_file)
 endif()
 
 # Set these up as variables to make reading the generated file easier
-set(CMAKE_COMMAND "/home/thanhtvt/miniconda3/envs/torch_lite/bin/cmake") # path
+set(CMAKE_COMMAND "/home/thanhtvt/miniconda3/lib/python3.9/site-packages/cmake/data/bin/cmake") # path
 set(source_file "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/tests/test_gpu.cu") # path
 set(NVCC_generated_dependency_file "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_gpu.dir/tests/test_gpu_generated_test_gpu.cu.o.NVCC-depend") # path
 set(cmake_dependency_file "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_gpu.dir/tests/test_gpu_generated_test_gpu.cu.o.depend") # path
-set(CUDA_make2cmake "/home/thanhtvt/miniconda3/envs/torch_lite/share/cmake-3.22/Modules/FindCUDA/make2cmake.cmake") # path
-set(CUDA_parse_cubin "/home/thanhtvt/miniconda3/envs/torch_lite/share/cmake-3.22/Modules/FindCUDA/parse_cubin.cmake") # path
+set(CUDA_make2cmake "/home/thanhtvt/miniconda3/lib/python3.9/site-packages/cmake/data/share/cmake-3.27/Modules/FindCUDA/make2cmake.cmake") # path
+set(CUDA_parse_cubin "/home/thanhtvt/miniconda3/lib/python3.9/site-packages/cmake/data/share/cmake-3.27/Modules/FindCUDA/parse_cubin.cmake") # path
 set(build_cubin OFF) # bool
 set(CUDA_HOST_COMPILER "/usr/bin/cc") # path
 # We won't actually use these variables for now, but we need to set this, in
@@ -71,7 +71,7 @@ set(generated_file_path "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/war
 set(generated_file_internal "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_gpu.dir/tests/./test_gpu_generated_test_gpu.cu.o") # path
 set(generated_cubin_file_internal "/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/build/CMakeFiles/test_gpu.dir/tests/./test_gpu_generated_test_gpu.cu.o.cubin.txt") # path
 
-set(CUDA_NVCC_EXECUTABLE "/usr/local/cuda-12.1/bin/nvcc") # path
+set(CUDA_NVCC_EXECUTABLE "/home/thanhtvt/miniconda3/bin/nvcc") # path
 set(CUDA_NVCC_FLAGS  -Xcompiler -fopenmp -gencode arch=compute_52,code=sm_52 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_62,code=sm_62 -gencode arch=compute_70,code=sm_70 -gencode arch=compute_75,code=sm_75 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86 --std=c++11 ;; ) # list
 # Build specific configuration flags
 set(CUDA_NVCC_FLAGS_DEBUG  ; )
@@ -79,7 +79,7 @@ set(CUDA_NVCC_FLAGS_MINSIZEREL  ; )
 set(CUDA_NVCC_FLAGS_RELEASE  ; )
 set(CUDA_NVCC_FLAGS_RELWITHDEBINFO  ; )
 set(nvcc_flags -m64) # list
-set(CUDA_NVCC_INCLUDE_DIRS [==[/usr/local/cuda-12.1/include;/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/include;/usr/local/cuda-12.1/include]==]) # list (needs to be in lua quotes to address backslashes)
+set(CUDA_NVCC_INCLUDE_DIRS [==[/home/thanhtvt/miniconda3/include;/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/include;/home/thanhtvt/miniconda3/include]==]) # list (needs to be in lua quotes to address backslashes)
 string(REPLACE "\\" "/" CUDA_NVCC_INCLUDE_DIRS "${CUDA_NVCC_INCLUDE_DIRS}")
 set(CUDA_NVCC_COMPILE_DEFINITIONS [==[]==]) # list (needs to be in lua quotes see #16510 ).
 set(format_flag "-c") # string
@@ -188,7 +188,7 @@ cuda_execute_process(
 # For CUDA 2.3 and below, -G -M doesn't work, so remove the -G flag
 # for dependency generation and hope for the best.
 set(depends_CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}")
-set(CUDA_VERSION 12.1)
+set(CUDA_VERSION 11.7)
 if(CUDA_VERSION VERSION_LESS "3.0")
   # Note that this will remove all occurrences of -G.
   list(REMOVE_ITEM depends_CUDA_NVCC_FLAGS "-G")

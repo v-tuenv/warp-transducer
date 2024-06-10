@@ -23,8 +23,8 @@ class _RNNT(Function):
 
         loss_func = warp_rnnt.gpu_rnnt if is_cuda else warp_rnnt.cpu_rnnt
         grads = torch.zeros_like(acts) if acts.requires_grad else torch.zeros(0).to(acts)
-        alphas = torch.zeros_like(acts) 
-        betas = torch.zeros_like(acts) 
+        alphas = torch.zeros_like(acts[..., 0]) 
+        betas = torch.zeros_like(acts[..., 0]) 
         minibatch_size = acts.size(0)
         costs = torch.zeros(minibatch_size, dtype=acts.dtype)
         loss_func(acts,
