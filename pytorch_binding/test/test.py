@@ -43,6 +43,13 @@ def wrap_and_call(acts, labels):
 
     costs, alphas, betas = fn(acts, labels, lengths, label_lengths)
     print(alphas.size(), betas.size(), " sizing")
+    print(-1 * torch.exp(alphas + betas))
+    import librosa 
+    print(librosa.sequence.dtw(
+        C = -1 * torch.exp(alphas + betas).detach().cpu().numpy()[0],
+        step_sizes_sigma=[[0, 1], [1, 0]],
+        return_steps=True
+    ))
     cost = torch.sum(costs)
     cost.backward()
     # print(repr(acts.grad.data.cpu().numpy()))
