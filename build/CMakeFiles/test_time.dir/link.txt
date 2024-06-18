@@ -1,0 +1,1 @@
+/usr/bin/c++   -O2 -fopenmp  -rdynamic CMakeFiles/test_time.dir/tests/test_time.cpp.o CMakeFiles/test_time.dir/tests/random.cpp.o  -o test_time libwarprnnt.so -Wl,-Bstatic -lcudart_static -Wl,-Bdynamic -lpthread -ldl -lrt 

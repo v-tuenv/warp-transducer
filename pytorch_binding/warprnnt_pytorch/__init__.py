@@ -56,6 +56,74 @@ class _RNNT(Function):
         return ctx.grads.mul_(grad_output), None, None, None, None, None, None
 
 
+class _RNNT2(Function):
+    @staticmethod
+    def forward(ctx, acts, labels, act_lens, label_lens, blank, reduction, fastemit_lambda):
+        """
+        acts: Tensor of (batch x seqLength x labelLength x outputDim) containing output from network
+        labels: 2 dimensional Tensor containing all the targets of the batch with zero padded
+        act_lens: Tensor of size (batch) containing size of each output sequence from the network
+        label_lens: Tensor of (batch) containing label length of each example
+        fastemit_lambda: Regularization parameter for FastEmit (https://arxiv.org/pdf/2010.11148.pdf)
+        """
+        is_cuda = acts.is_cuda
+
+        certify_inputs(acts, labels, act_lens, label_lens)
+
+        loss_func = warp_rnnt.gpu_rnnt if is_cuda else warp_rnnt.cpu_rnnt
+        grads = torch.zeros_like(acts) if acts.requires_grad else torch.zeros(0).to(acts)
+        alphas = torch.zeros_like(acts[..., 0]) 
+        betas = torch.zeros_like(acts[..., 0]) 
+        minibatch_size = acts.size(0)
+        costs = torch.zeros(minibatch_size, dtype=acts.dtype)
+        loss_func(acts,
+                  labels,
+                  act_lens,
+                  label_lens,
+                  costs,
+                  grads,
+                  alphas,
+                  betas,
+                  blank,
+                  fastemit_lambda,
+                  0)
+
+        if reduction in ['sum', 'mean']:
+            costs = costs.sum().unsqueeze_(-1)
+            if reduction == 'mean':
+                costs /= minibatch_size
+                grads /= minibatch_size
+
+        costs = costs.to(acts.device)
+        ctx.grads = grads
+        ctx.alphas = alphas
+        ctx.betas = betas
+        ctx.acts = acts
+        return costs, alphas, betas
+
+    @staticmethod
+    def backward(ctx, grad_output, dx, dy):
+        # dx === [mxnx...]
+        grad_output = grad_output.view(-1, 1, 1, 1).to(ctx.grads)
+        ctx.grads.mul_(grad_output)
+        x = ctx.grads
+        # ??? 
+        dx = ctx.alphas * dx 
+        dy = ctx.betas * dy 
+        gradient2 = torch.zeros_like(x)
+        gradient2[:, :-1, : , 0] = dx[:, 1:] 
+        gradient2[:, :, :-1, 1] = dx[:, :, 1:]
+        gradient2[:, 1:, :, 0] += dy[:, :-1]
+        gradient2[:, :, 1:, 0] += dy[:, :, :-1]
+        
+        gradient2 = gradient2 * torch.exp(
+            ctx.acts
+        )
+        x += gradient2
+        print(dx, dy)
+        return x, None, None, None, None, None, None
+
+
 def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction='mean', fastemit_lambda=0.001):
     """ RNN Transducer Loss
 
@@ -92,6 +160,38 @@ class RNNTLoss(Module):
         self.reduction = reduction
         self.fastemit_lambda = fastemit_lambda
         self.loss = _RNNT.apply
+
+    def forward(self, acts, labels, act_lens, label_lens):
+        """
+        acts: Tensor of (batch x seqLength x labelLength x outputDim) containing output from network
+        labels: 2 dimensional Tensor containing all the targets of the batch with zero padded
+        act_lens: Tensor of size (batch) containing size of each output sequence from the network
+        label_lens: Tensor of (batch) containing label length of each example
+        """
+        if not acts.is_cuda:
+            # NOTE manually done log_softmax for CPU version,
+            # log_softmax is computed within GPU version.
+            acts = torch.nn.functional.log_softmax(acts, -1)
+
+        loss, alphas, betas = self.loss(acts, labels, act_lens, label_lens, self.blank, self.reduction, self.fastemit_lambda)
+        return (loss, alphas, betas)
+
+
+class RNNTLoss2(Module):
+    """
+    Parameters:
+        blank (int, optional): blank label. Default: 0.
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            'none' | 'mean' | 'sum'. 'none': no reduction will be applied, 
+            'mean': the output losses will be divided by the target lengths and
+            then the mean over the batch is taken. Default: 'mean'
+    """
+    def __init__(self, blank=0, fastemit_lambda=0.001, reduction='mean'):
+        super(RNNTLoss2, self).__init__()
+        self.blank = blank
+        self.reduction = reduction
+        self.fastemit_lambda = fastemit_lambda
+        self.loss = _RNNT2.apply
 
     def forward(self, acts, labels, act_lens, label_lens):
         """

@@ -14,14 +14,15 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 
-from warprnnt_pytorch import RNNTLoss
+from warprnnt_pytorch import RNNTLoss, RNNTLoss2
 from transducer_np import RNNTLoss as rnntloss
+# from transducer_np import RNNTLoss2 as rnntloss2
 
 parser = argparse.ArgumentParser(description='MXNet RNN Transducer Test.')
 parser.add_argument('--np', default=False, action='store_true', help='numpy loss')
 args = parser.parse_args()
 
-fn = rnntloss() if args.np else RNNTLoss(reduction='sum')
+fn = rnntloss() if args.np else RNNTLoss2(reduction='sum')
 
 gpu = 1
 def wrap_and_call(acts, labels):
@@ -42,16 +43,21 @@ def wrap_and_call(acts, labels):
         label_lengths = label_lengths.cuda(gpu)
 
     costs, alphas, betas = fn(acts, labels, lengths, label_lengths)
-    print(alphas.size(), betas.size(), " sizing")
-    print(-1 * torch.exp(alphas + betas))
+    # costs = costs + alphas.sum()
+    print(alphas.size(), betas.size(), acts.size(), " sizing")
+    print(alphas)
+    print(betas)
+    print(torch.exp(alphas + betas))
     import librosa 
     print(librosa.sequence.dtw(
         C = -1 * torch.exp(alphas + betas).detach().cpu().numpy()[0],
         step_sizes_sigma=[[0, 1], [1, 0]],
         return_steps=True
     ))
-    cost = torch.sum(costs)
+    cost = torch.sum(costs) + alphas.sum()
     cost.backward()
+    # alphas.sum().backward()
+    print("---------------------")
     # print(repr(acts.grad.data.cpu().numpy()))
     return costs.data.cpu().numpy(), acts.grad.data.cpu().numpy()
 

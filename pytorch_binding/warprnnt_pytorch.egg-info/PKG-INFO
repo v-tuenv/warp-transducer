@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: warprnnt_pytorch
+Name: warprnnt-pytorch
 Version: 0.1
 Summary: PyTorch wrapper for RNN-Transducer
 Home-page: https://github.com/HawkAaron/warp-transducer

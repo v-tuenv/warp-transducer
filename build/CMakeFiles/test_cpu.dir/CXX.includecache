@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/rnnt.h
+cstddef
+-
+
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/tests/random.cpp
+vector
+-
+random
+-
+
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/tests/test.h
+stdexcept
+-
+vector
+-
+limits
+-
+numeric
+-
+rnnt.h
+-
+
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/tests/test_cpu.cpp
+cmath
+-
+random
+-
+tuple
+-
+vector
+-
+iostream
+-
+rnnt.h
+-
+test.h
+/home/thanhtvt/workspace/tuenv2/asr/wrap_transducer/warp-transducer-xx/tests/test.h
+
